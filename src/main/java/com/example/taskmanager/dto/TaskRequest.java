@@ -1,19 +1,10 @@
-package com.example.taskmanager.entity;
+package com.example.taskmanager.dto;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-@Entity
-@Table(name = "tasks")
-public class Task {
+public class TaskRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
     @NotBlank(message = "Title is required")
     @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
@@ -23,20 +14,7 @@ public class Task {
 
     private boolean completed;
 
-    private LocalDateTime createdAt;
-
-    public Task() {
-    }
-
-    public Task(String title, String description) {
-        this.title = title;
-        this.description = description;
-        this.completed = false;
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public Long getId() {
-        return id;
+    public TaskRequest() {
     }
 
     public String getTitle() {
@@ -61,13 +39,5 @@ public class Task {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

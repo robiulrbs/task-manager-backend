@@ -1,42 +1,38 @@
-package com.example.taskmanager.entity;
+package com.example.taskmanager.dto;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
-@Entity
-@Table(name = "tasks")
-public class Task {
+public class TaskResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    @NotBlank(message = "Title is required")
-    @Size(max = 100, message = "Title must not exceed 100 characters")
     private String title;
-
-    @Size(max = 500, message = "Description must not exceed 500 characters")
     private String description;
-
     private boolean completed;
-
     private LocalDateTime createdAt;
 
-    public Task() {
+    public TaskResponse() {
     }
 
-    public Task(String title, String description) {
+    public TaskResponse(
+            Long id,
+            String title,
+            String description,
+            boolean completed,
+            LocalDateTime createdAt
+    ) {
+        this.id = id;
         this.title = title;
         this.description = description;
-        this.completed = false;
-        this.createdAt = LocalDateTime.now();
+        this.completed = completed;
+        this.createdAt = createdAt;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitle() {

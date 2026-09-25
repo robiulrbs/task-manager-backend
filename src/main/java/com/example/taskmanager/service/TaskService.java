@@ -1,9 +1,13 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.dto.TaskRequest;
+import com.example.taskmanager.dto.TaskResponse;
 import com.example.taskmanager.entity.Task;
+import com.example.taskmanager.exception.TaskNotFoundException;
 import com.example.taskmanager.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -15,35 +19,61 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+    public List<TaskResponse> getAllTasks() {
+        return taskRepository.findAll()
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public Task getTaskById(Long id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+    public TaskResponse getTaskById(Long id) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
+
+        return toResponse(task);
     }
 
-    public Task createTask(Task task) {
-        return taskRepository.save(task);
+    public TaskResponse createTask(TaskRequest request) {
+        Task task = new Task();
+
+        task.setTitle(request.getTitle());
+        task.setDescription(request.getDescription());
+        task.setCompleted(request.isCompleted());
+        task.setCreatedAt(LocalDateTime.now());
+
+        Task savedTask = taskRepository.save(task);
+
+        return toResponse(savedTask);
     }
 
-    public Task updateTask(Long id, Task updatedTask) {
+    public TaskResponse updateTask(Long id, TaskRequest request) {
         Task existingTask = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
 
-        existingTask.setTitle(updatedTask.getTitle());
-        existingTask.setDescription(updatedTask.getDescription());
-        existingTask.setCompleted(updatedTask.isCompleted());
+        existingTask.setTitle(request.getTitle());
+        existingTask.setDescription(request.getDescription());
+        existingTask.setCompleted(request.isCompleted());
 
-        return taskRepository.save(existingTask);
+        Task updatedTask = taskRepository.save(existingTask);
+
+        return toResponse(updatedTask);
     }
 
     public void deleteTask(Long id) {
         if (!taskRepository.existsById(id)) {
-            throw new RuntimeException("Task not found");
+            throw new TaskNotFoundException("Task not found");
         }
 
         taskRepository.deleteById(id);
+    }
+
+    private TaskResponse toResponse(Task task) {
+        return new TaskResponse(
+                task.getId(),
+                task.getTitle(),
+                task.getDescription(),
+                task.isCompleted(),
+                task.getCreatedAt()
+        );
     }
 }
